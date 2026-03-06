@@ -84,7 +84,25 @@ const currentIndex = computed(() => {
 })
 
 const getPhotoSrc = (photo: Photo) => {
-  return photo.image?.url || photo.src || `https://picsum.photos/seed/photo${photo.id}/800/1000`
+  const strapiUrl = useRuntimeConfig().public.strapiUrl || 'http://localhost:1337'
+  
+  // Strapi v4 嵌套格式: image.data.attributes.url
+  if (photo.image?.data?.attributes?.url) {
+    const url = photo.image.data.attributes.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
+  // Strapi v4 直接属性格式: image.attributes.url
+  if (photo.image?.attributes?.url) {
+    const url = photo.image.attributes.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
+  // 旧格式或直接 URL
+  if (photo.image?.url) {
+    const url = photo.image.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
+  // 兜底
+  return photo.src || `https://picsum.photos/seed/photo${photo.id}/800/1000`
 }
 
 onMounted(() => {

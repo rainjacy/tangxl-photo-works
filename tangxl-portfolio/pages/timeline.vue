@@ -42,6 +42,7 @@
                 v-for="photo in era.photos" 
                 :key="photo.id"
                 class="aspect-square bg-gray-100 cursor-pointer overflow-hidden group"
+                @click="openLightbox(photo)"
               >
                 <img 
                   :src="getPhotoSrc(photo)" 
@@ -54,6 +55,14 @@
         </div>
       </div>
     </div>
+
+    <PhotoLightbox 
+      v-if="selectedPhoto" 
+      :photo="selectedPhoto" 
+      :photos="timelineData?.flatMap((era: TimelineEra) => era.photos) || []"
+      @close="selectedPhoto = null"
+      @navigate="navigatePhoto"
+    />
   </div>
 </template>
 
@@ -66,16 +75,42 @@ interface TimelineEra {
 }
 
 const getPhotoSrc = (photo: any): string => {
-  const strapiUrl = useRuntimeConfig().public.strapiUrl
-  if (photo.image?.url) {
-    const url = photo.image.url
+  const strapiUrl = useRuntimeConfig().public.strapiUrl || 'http://localhost:1337'
+  // Strapi v4 嵌套格式: image.data.attributes.url
+  if (photo.image?.data?.attributes?.url) {
+    const url = photo.image.data.attributes.url
     return url.startsWith('http') ? url : `${strapiUrl}${url}`
   }
+  // Strapi v4 直接属性格式: image.attributes.url
   if (photo.image?.attributes?.url) {
     const url = photo.image.attributes.url
     return url.startsWith('http') ? url : `${strapiUrl}${url}`
   }
+  // 旧格式
+  if (photo.image?.url) {
+    const url = photo.image.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
   return `https://picsum.photos/seed/t${photo.id}/400/400`
+}
+
+const selectedPhoto = ref<any>(null)
+
+const openLightbox = (photo: any) => {
+  selectedPhoto.value = photo
+}
+
+const navigatePhoto = (direction: 'prev' | 'next') => {
+  if (!selectedPhoto.value) return
+  // 找到当前照片在 timelineData 中的所有照片
+  const allPhotos = timelineData.value?.flatMap((era: TimelineEra) => era.photos) || []
+  const currentIndex = allPhotos.findIndex((p: any) => p.id === selectedPhoto.value?.id)
+  let newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1
+  
+  if (newIndex < 0) newIndex = allPhotos.length - 1
+  if (newIndex >= allPhotos.length) newIndex = 0
+  
+  selectedPhoto.value = allPhotos[newIndex]
 }
 
 const { periods, fetchPeriods } = usePeriods()
