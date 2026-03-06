@@ -47,45 +47,61 @@
 
       <div class="space-y-4">
         <h3 class="font-medium text-lg">选择地点</h3>
-        <div class="space-y-2">
+        
+        <div 
+          v-for="location in locationsWithCount" 
+          :key="location.id"
+          class="border border-gray-100 rounded-lg overflow-hidden"
+        >
           <button 
-            v-for="location in locationsWithCount" 
-            :key="location.id"
-            @click="selectLocation(location)"
+            @click="toggleLocation(location)"
             :class="[
-              'w-full text-left px-4 py-3 transition-all duration-300',
+              'w-full text-left px-4 py-3 transition-all duration-300 flex justify-between items-center',
               selectedLocation?.id === location.id
                 ? 'bg-seal-red text-white'
                 : 'bg-gray-50 hover:bg-gray-100'
             ]"
           >
-            <span class="font-medium">{{ location.name }}</span>
-            <span class="block text-xs" :class="selectedLocation?.id === location.id ? 'text-white/70' : 'text-gray-500'">
-              {{ location.photoCount }} 张照片
-            </span>
+            <div>
+              <span class="font-medium">{{ location.name }}</span>
+              <span class="block text-xs" :class="selectedLocation?.id === location.id ? 'text-white/70' : 'text-gray-500'">
+                {{ location.photoCount }} 张照片
+              </span>
+            </div>
+            <svg 
+              class="w-5 h-5 transition-transform duration-300" 
+              :class="selectedLocation?.id === location.id ? 'rotate-180' : ''"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
           </button>
-        </div>
-
-        <Transition name="fade">
-          <div v-if="selectedLocation" class="mt-6 p-4 bg-gray-50">
-            <h4 class="font-medium mb-2">{{ selectedLocation.name }}</h4>
-            <p class="text-sm text-gray-500">{{ selectedLocation.description }}</p>
-            <div class="grid grid-cols-2 gap-2 mt-4">
-              <div 
-                v-for="(photo, index) in getLocationPhotos(selectedLocation.id)" 
-                :key="photo.id" 
-                class="aspect-square bg-gray-200 cursor-pointer overflow-hidden"
-                @click="openLightbox(photo)"
-              >
-                <img 
-                  :src="getPhotoSrc(photo)" 
-                  :alt="photo.title"
-                  class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                />
+          
+          <Transition name="expand">
+            <div v-if="selectedLocation?.id === location.id && getLocationPhotos(location.id).length > 0" class="p-3 bg-white">
+              <div class="grid grid-cols-2 gap-2">
+                <div 
+                  v-for="photo in getLocationPhotos(location.id)" 
+                  :key="photo.id" 
+                  class="aspect-square bg-gray-100 cursor-pointer overflow-hidden"
+                  @click="openLightbox(photo)"
+                >
+                  <img 
+                    :src="getPhotoSrc(photo)" 
+                    :alt="photo.title"
+                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </Transition>
+          </Transition>
+          
+          <Transition name="expand">
+            <div v-if="selectedLocation?.id === location.id && getLocationPhotos(location.id).length === 0" class="p-4 bg-white text-center text-gray-400 text-sm">
+              暂无照片
+            </div>
+          </Transition>
+        </div>
       </div>
     </div>
 
@@ -206,6 +222,14 @@ const selectLocation = (location: Location) => {
   selectedLocation.value = location
 }
 
+const toggleLocation = (location: Location) => {
+  if (selectedLocation.value?.id === location.id) {
+    selectedLocation.value = null
+  } else {
+    selectedLocation.value = location
+  }
+}
+
 const openLightbox = (photo: any) => {
   selectedPhoto.value = photo
 }
@@ -235,5 +259,22 @@ useHead({
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  max-height: 500px;
 }
 </style>
