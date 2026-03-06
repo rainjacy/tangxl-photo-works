@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "Home",
+    "gallery": "Gallery",
+    "timeline": "Timeline",
+    "map": "Map",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "title": "Echoes of Silence",
+    "subtitle": "Tang Xilin's Photography Portfolio",
+    "enter": "Enter Gallery",
+    "description": "Documenting Songjiang's transformation from agricultural to industrial civilization"
+  },
+  "gallery": {
+    "title": "Gallery",
+    "filter": "Filter",
+    "all": "All",
+    "1970s": "1970s",
+    "1990s": "1990s",
+    "newCentury": "New Century",
+    "location": "Location",
+    "noResults": "No works found"
+  },
+  "timeline": {
+    "title": "Timeline",
+    "1970s": "1970s",
+    "1990s": "1990s",
+    "newCentury": "New Century"
+  },
+  "map": {
+    "title": "Songjiang Memories",
+    "selectLocation": "Select Location"
+  },
+  "about": {
+    "title": "About the Artist",
+    "artist": "Tang Xilin",
+    "bio": "Biography",
+    "exhibitions": "Exhibitions",
+    "media": "Media Coverage"
+  },
+  "contact": {
+    "title": "Contact",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "submit": "Submit",
+    "success": "Submitted successfully",
+    "copyright": "Copyright Inquiry",
+    "collection": "Collection Interest"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "close": "Close",
+    "back": "Back"
+  }
+}

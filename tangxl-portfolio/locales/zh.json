@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "首页",
+    "gallery": "作品",
+    "timeline": "时间轴",
+    "map": "地图",
+    "about": "关于",
+    "contact": "联系"
+  },
+  "home": {
+    "title": "回影无声",
+    "subtitle": "唐西林摄影作品集",
+    "enter": "进入作品集",
+    "description": "记录松江从农业文明向工业文明转型的历史进程"
+  },
+  "gallery": {
+    "title": "作品浏览",
+    "filter": "筛选",
+    "all": "全部",
+    "1970s": "70年代",
+    "1990s": "90年代",
+    "newCentury": "新世纪",
+    "location": "地点",
+    "noResults": "暂无作品"
+  },
+  "timeline": {
+    "title": "时间轴",
+    "1970s": "七十年代",
+    "1990s": "九十年代",
+    "newCentury": "新世纪"
+  },
+  "map": {
+    "title": "松江记忆",
+    "selectLocation": "选择地点"
+  },
+  "about": {
+    "title": "关于艺术家",
+    "artist": "唐西林",
+    "bio": "摄影师简介",
+    "exhibitions": "展览经历",
+    "media": "媒体报道"
+  },
+  "contact": {
+    "title": "联系方式",
+    "name": "姓名",
+    "email": "邮箱",
+    "message": "留言",
+    "submit": "提交",
+    "success": "提交成功",
+    "copyright": "版权咨询",
+    "collection": "收藏意向"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "close": "关闭",
+    "back": "返回"
+  }
+}
