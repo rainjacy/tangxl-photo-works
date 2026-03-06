@@ -1,0 +1,26 @@
+{
+  "collectionName": "categories",
+  "info": {
+    "singularName": "category",
+    "pluralName": "categories",
+    "displayName": "Category",
+    "description": "作品分类"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 50
+    },
+    "value": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 50
+    }
+  }
+}

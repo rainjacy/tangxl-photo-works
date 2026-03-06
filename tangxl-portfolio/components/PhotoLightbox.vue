@@ -38,7 +38,7 @@
 
       <div class="max-w-5xl max-h-[90vh] px-16">
         <img 
-          :src="photo.src" 
+          :src="getPhotoSrc(photo)" 
           :alt="photo.title"
           class="max-w-full max-h-[80vh] object-contain"
         />
@@ -62,6 +62,9 @@ interface Photo {
   year: string
   location: string
   src: string
+  image?: {
+    url: string
+  } | null
 }
 
 const props = defineProps<{
@@ -79,6 +82,10 @@ const lightboxRef = ref<HTMLElement | null>(null)
 const currentIndex = computed(() => {
   return props.photos.findIndex(p => p.id === props.photo.id)
 })
+
+const getPhotoSrc = (photo: Photo) => {
+  return photo.image?.url || photo.src || `https://picsum.photos/seed/photo${photo.id}/800/1000`
+}
 
 onMounted(() => {
   lightboxRef.value?.focus()

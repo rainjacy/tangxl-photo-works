@@ -5,7 +5,15 @@
       <p class="text-gray-500">穿越时光 · 见证变迁</p>
     </div>
 
-    <div class="relative">
+    <div v-if="pending" class="text-center py-20">
+      <p class="text-gray-400">加载中...</p>
+    </div>
+
+    <div v-else-if="error" class="text-center py-20">
+      <p class="text-gray-400">加载失败</p>
+    </div>
+
+    <div v-else class="relative">
       <div class="absolute left-1/2 -translate-x-1/2 h-full w-px bg-gray-200 hidden md:block"></div>
 
       <div 
@@ -36,7 +44,7 @@
                 class="aspect-square bg-gray-100 cursor-pointer overflow-hidden group"
               >
                 <img 
-                  :src="photo.src" 
+                  :src="getPhotoSrc(photo)" 
                   :alt="photo.title"
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
@@ -50,41 +58,40 @@
 </template>
 
 <script setup lang="ts">
-const timelineData = [
-  {
-    period: '1970s',
-    title: '农业文明的尾声',
-    description: '记录松江最后的农业风光，古城区的传统生活场景',
-    photos: [
-      { id: 1, title: '古城余韵', src: 'https://picsum.photos/seed/t1/400/400' },
-      { id: 2, title: '老街清晨', src: 'https://picsum.photos/seed/t2/400/400' },
-      { id: 3, title: '古桥流水', src: 'https://picsum.photos/seed/t3/400/400' },
-      { id: 4, title: '渡口记忆', src: 'https://picsum.photos/seed/t4/400/400' }
-    ]
-  },
-  {
-    period: '1990s',
-    title: '工业化的浪潮',
-    description: '城市扩张，工业区崛起，传统与现代的碰撞',
-    photos: [
-      { id: 5, title: '工业变迁', src: 'https://picsum.photos/seed/t5/400/400' },
-      { id: 6, title: '老城改造', src: 'https://picsum.photos/seed/t6/400/400' },
-      { id: 7, title: '新城崛起', src: 'https://picsum.photos/seed/t7/400/400' },
-      { id: 8, title: '建设中的松江', src: 'https://picsum.photos/seed/t8/400/400' }
-    ]
-  },
-  {
-    period: '2000s',
-    title: '新世纪的模样',
-    description: '现代化的新城，社区的发展与变迁',
-    photos: [
-      { id: 9, title: '现代社区', src: 'https://picsum.photos/seed/t9/400/400' },
-      { id: 10, title: '城市新貌', src: 'https://picsum.photos/seed/t10/400/400' },
-      { id: 11, title: '公园绿地', src: 'https://picsum.photos/seed/t11/400/400' },
-      { id: 12, title: '夜幕松江', src: 'https://picsum.photos/seed/t12/400/400' }
-    ]
+interface TimelineEra {
+  period: string
+  title: string
+  description: string
+  photos: any[]
+}
+
+const getPhotoSrc = (photo: any): string => {
+  const strapiUrl = useRuntimeConfig().public.strapiUrl
+  if (photo.image?.url) {
+    const url = photo.image.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
   }
-]
+  if (photo.image?.attributes?.url) {
+    const url = photo.image.attributes.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
+  return `https://picsum.photos/seed/t${photo.id}/400/400`
+}
+
+const { periods, fetchPeriods } = usePeriods()
+
+const { data: timelineData, pending, error } = await useAsyncData('periods', async () => {
+  await fetchPeriods()
+  
+  const result: TimelineEra[] = periods.value.map((period: any) => ({
+    period: period.period,
+    title: period.title,
+    description: period.description || '',
+    photos: period.works?.data || period.works || []
+  }))
+  
+  return result
+})
 
 useHead({
   title: '时间轴 - 回影无声'

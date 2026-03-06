@@ -55,5 +55,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: {
     compatibilityVersion: 4
+  },
+
+  runtimeConfig: {
+    public: {
+      strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
+    }
   }
 })

@@ -7,7 +7,7 @@
 
     <div class="flex flex-wrap gap-4 justify-center mb-12">
       <button 
-        v-for="category in categories" 
+        v-for="category in categoryOptions" 
         :key="category.value"
         @click="activeCategory = category.value"
         :class="[
@@ -21,7 +21,15 @@
       </button>
     </div>
 
-    <div class="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+    <div v-if="pending" class="text-center py-20">
+      <p class="text-gray-400">加载中...</p>
+    </div>
+
+    <div v-else-if="error" class="text-center py-20">
+      <p class="text-gray-400">加载失败</p>
+    </div>
+
+    <div v-else class="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
       <div 
         v-for="photo in filteredPhotos" 
         :key="photo.id"
@@ -32,8 +40,8 @@
           <div 
             class="w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
             :style="{ 
-              backgroundImage: `url(${photo.src})`,
-              paddingBottom: `${(photo.height / photo.width) * 100}%`
+              backgroundImage: `url(${getPhotoSrc(photo)})`,
+              paddingBottom: `${((photo.height || photo.width || 800) / (photo.width || 800)) * 100}%`
             }"
           ></div>
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
@@ -45,7 +53,7 @@
       </div>
     </div>
 
-    <div v-if="filteredPhotos.length === 0" class="text-center py-20">
+    <div v-if="!pending && !error && filteredPhotos.length === 0" class="text-center py-20">
       <p class="text-gray-400">暂无作品</p>
     </div>
 
@@ -68,34 +76,43 @@ interface Photo {
   src: string
   width: number
   height: number
-  category: string
+  category: any
+  image: any
 }
 
 const activeCategory = ref('all')
 const selectedPhoto = ref<Photo | null>(null)
 
-const categories = [
+const getPhotoSrc = (photo: any): string => {
+  const strapiUrl = useRuntimeConfig().public.strapiUrl
+  if (photo.image?.url) {
+    const url = photo.image.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
+  if (photo.image?.attributes?.url) {
+    const url = photo.image.attributes.url
+    return url.startsWith('http') ? url : `${strapiUrl}${url}`
+  }
+  return `https://picsum.photos/seed/photo${photo.id}/800/1000`
+}
+
+const categoryOptions = [
   { value: 'all', label: '全部' },
   { value: '1970s', label: '70年代' },
   { value: '1990s', label: '90年代' },
   { value: 'newCentury', label: '新世纪' }
 ]
 
-const photos: Photo[] = [
-  { id: 1, title: '古城余韵', year: '1978', location: '醉白池', src: 'https://picsum.photos/seed/photo1/800/1000', width: 800, height: 1000, category: '1970s' },
-  { id: 2, title: '老街清晨', year: '1985', location: '中山路', src: 'https://picsum.photos/seed/photo2/800/600', width: 800, height: 600, category: '1970s' },
-  { id: 3, title: '工业变迁', year: '1992', location: '松江工业区', src: 'https://picsum.photos/seed/photo3/800/800', width: 800, height: 800, category: '1990s' },
-  { id: 4, title: '老宅门楼', year: '1988', location: '仓城', src: 'https://picsum.photos/seed/photo4/800/1200', width: 800, height: 1200, category: '1970s' },
-  { id: 5, title: '新城崛起', year: '2005', location: '松江新城', src: 'https://picsum.photos/seed/photo5/800/600', width: 800, height: 600, category: 'newCentury' },
-  { id: 6, title: '渡口记忆', year: '1995', location: '黄浦江渡口', src: 'https://picsum.photos/seed/photo6/800/900', width: 800, height: 900, category: '1990s' },
-  { id: 7, title: '老城改造', year: '2010', location: '老城区', src: 'https://picsum.photos/seed/photo7/800/700', width: 800, height: 700, category: 'newCentury' },
-  { id: 8, title: '古桥流水', year: '1982', location: '大仓桥', src: 'https://picsum.photos/seed/photo8/800/1100', width: 800, height: 1100, category: '1970s' },
-  { id: 9, title: '现代社区', year: '2018', location: '松江', src: 'https://picsum.photos/seed/photo9/800/650', width: 800, height: 650, category: 'newCentury' }
-]
+const { works, fetchWorks } = useWorks()
+
+const { data: photos, pending, error } = await useAsyncData('works', async () => {
+  return await fetchWorks()
+})
 
 const filteredPhotos = computed(() => {
-  if (activeCategory.value === 'all') return photos
-  return photos.filter(p => p.category === activeCategory.value)
+  if (!photos.value) return []
+  if (activeCategory.value === 'all') return photos.value as any[]
+  return (photos.value as any[]).filter(p => p.category?.value === activeCategory.value)
 })
 
 const openLightbox = (photo: Photo) => {
